@@ -1,9 +1,20 @@
 require('dotenv').config();
+const os = require('os');
+const osFreeMem = os.freemem();
+const osTotalMem = os.totalmem();
+// const allFreeMem = (osFreeMem / (1024 * 1024))
+// console.log(`Total free memory: ${allFreeMem}`)
+
+
+// const avbMem = (osTotalMem / (1024 * 1024))
+
 const express = require('express');
 const mongoose = require('mongoose');
-const userAgent = require('ua-parser-js');
+const userAgent = require('express-useragent');
 const app = express();
 const port = process.env.PORT_APP || 3000;
+
+app.use(userAgent.express());
 
 const {CpuData} = require('./model/cpuData');
 
@@ -11,29 +22,26 @@ app.get('/',(req, res) =>{
     res.send('Hello World');
 });
 
-app.get('/cpu-data',async (req, res)=>{
+app.get('/data',async (req, res)=>{
     const data = await CpuData.find();
-   const ua = userAgent(req.headers['user-agent']);
-    return res.status(200).json(ua);
+    return res.status(200).json(data);
 });
 
-app.post('/cpu-data', async(req,res)=>{
-    var source = req.headers['user-agent'];
-    const ua = userAgent.parse(source);
-    
+app.post('/data', async(req,res)=>{
+    const ua = req.useragent;
+    const hostname = req.hostname;
     const memory = process.memoryUsage();
-    const cpu = process.cpuUsage();
     const data = {
-        cpu_name : 'Dana Cpu',
-        type: 'Windows',
-        platform : 'WIndows 64 bit',
-        release: 'kapan"',
-        remaining_ram: cpu,
-        total_ram:12312321,
+        cpu_name : hostname,
+        type: ua.os,
+        platform : ua.platform,
+        release: ua.version,
+        remaining_ram: osFreeMem / (1024 * 1024),
+        total_ram: osTotalMem / (1024 * 1024),
     }
-    // const store = await CpuData.create(data);
+    const store = await CpuData.create(data);
     
-    return res.status(200).json(cpu);
+    return res.status(200).json(data);
 });
 
 
