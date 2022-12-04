@@ -2,12 +2,6 @@ require('dotenv').config();
 const os = require('os');
 const osFreeMem = os.freemem();
 const osTotalMem = os.totalmem();
-// const allFreeMem = (osFreeMem / (1024 * 1024))
-// console.log(`Total free memory: ${allFreeMem}`)
-
-
-// const avbMem = (osTotalMem / (1024 * 1024))
-
 const express = require('express');
 const mongoose = require('mongoose');
 const userAgent = require('express-useragent');
